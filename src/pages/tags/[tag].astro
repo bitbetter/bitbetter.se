@@ -1,0 +1,52 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostList from '../../components/PostList.astro';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog', ({ data }) => !data.draft);
+  const tagMap = new Map<string, { displayName: string; posts: typeof posts }>();
+
+  for (const post of posts) {
+    for (const tag of post.data.tags) {
+      const key = tag.toLowerCase();
+      const entry = tagMap.get(key) ?? { displayName: tag, posts: [] };
+      entry.posts.push(post);
+      tagMap.set(key, entry);
+    }
+  }
+
+  return Array.from(tagMap.entries()).map(([slug, { displayName, posts }]) => ({
+    params: { tag: slug },
+    props: {
+      displayName,
+      posts: posts.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf()),
+    },
+  }));
+}
+
+interface Props {
+  displayName: string;
+  posts: Awaited<ReturnType<typeof getCollection<'blog'>>>;
+}
+
+const { displayName, posts } = Astro.props;
+---
+<BaseLayout title={displayName} bodyClass="archive-template">
+  <header class="main-header tag-head no-cover">
+    <nav class="main-nav overlay clearfix">
+      <a class="back-button icon-arrow-left" href="/">Home</a>
+      <a class="subscribe-button icon-feed" href="/feed.xml">{displayName}</a>
+    </nav>
+    <div class="vertical">
+      <div class="main-header-content inner">
+        <h1 class="page-title">{displayName}</h1>
+        <h2 class="page-description">A {posts.length}-post collection</h2>
+      </div>
+    </div>
+  </header>
+
+  <main id="content" class="content" role="main">
+    <PostList posts={posts} />
+  </main>
+</BaseLayout>

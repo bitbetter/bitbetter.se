@@ -1,0 +1,25 @@
+@import './casper.css';
+
+/* Overrides from old Middleman application.css.scss */
+pre {
+  background: transparent;
+  border-style: none;
+  padding: initial;
+}
+
+pre.highlight,
+pre.astro-code,
+.post-content pre {
+  padding: 16px;
+  overflow: auto;
+  font-size: 85%;
+  line-height: 1.45;
+  background-color: #f7f7f7;
+  border-radius: 3px;
+}
+
+.post-content pre code {
+  background: transparent;
+  font-size: inherit;
+  padding: 0;
+}

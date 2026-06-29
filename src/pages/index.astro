@@ -1,0 +1,32 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PostList from '../components/PostList.astro';
+import { SITE } from '../consts';
+
+const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
+
+const cover = '/images/golden-gate-bridge-bg.jpg';
+---
+<BaseLayout bodyClass="home-template">
+  <header class="main-header" style={`background-image: url(${cover})`}>
+    <nav class="main-nav overlay clearfix">
+      <a class="subscribe-button icon-feed" href="/feed.xml">Subscribe</a>
+    </nav>
+    <div class="vertical">
+      <div class="main-header-content inner">
+        <h1 class="page-title">{SITE.name}</h1>
+        <h2 class="page-description">{SITE.description}</h2>
+      </div>
+    </div>
+    <a class="scroll-down icon-arrow-left" href="#content" data-offset="-45">
+      <span class="hidden">Scroll Down</span>
+    </a>
+  </header>
+
+  <main id="content" class="content" role="main">
+    <PostList posts={posts} />
+  </main>
+</BaseLayout>

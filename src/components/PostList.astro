@@ -1,0 +1,46 @@
+---
+import { AUTHOR, SITE } from '../consts';
+import Gravatar from './Gravatar.astro';
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  posts: CollectionEntry<'blog'>[];
+}
+
+const { posts } = Astro.props;
+---
+{posts.map((post) => {
+  const { title, subtitle, date, tags } = post.data;
+  const dateStr = date.toLocaleDateString('en-GB', SITE.dateFormat);
+  const isoDate = date.toISOString().slice(0, 10);
+  return (
+    <article class="post">
+      <header class="post-header">
+        <h2 class="post-title"><a href={`/${post.id}/`}>{title}</a></h2>
+      </header>
+      <section class="post-excerpt">
+        <p>
+          {subtitle}
+          {' '}
+          <a class="read-more" href={`/${post.id}/`}>&raquo;</a>
+        </p>
+      </section>
+      <footer class="post-meta">
+        <Gravatar size={24} class="author-thumb" />
+        <a href="/author/">{AUTHOR.name}</a>
+        {tags.length > 0 && (
+          <Fragment>
+            {' on '}
+            {tags.map((tag, i) => (
+              <Fragment>
+                <a href={`/tags/${tag.toLowerCase()}/`}>{tag}</a>
+                {i < tags.length - 1 && ', '}
+              </Fragment>
+            ))}
+          </Fragment>
+        )}
+        <time class="post-date" datetime={isoDate}>{dateStr}</time>
+      </footer>
+    </article>
+  );
+})}
